@@ -166,13 +166,6 @@ void __declspec(naked) CenterHUD_CC()
         mov rax, rdx                            // Original code
         movups[rdx], xmm0                       // Original code
 
-        // This isn't optimal but it works
-        // Ideally we would get GObject name and check for "fade" or "wipe"
-        //cmp byte ptr[rcx + 0x200], 2            // (FadeType) If 1 then resize image brush
-        //je checkFade  
-        //cmp dword ptr[rcx+0x260], 0x3F800000
-        //je checkWipe
-
         cmp [iNarrowAspect], 0
         je resizeHUDHor
         cmp [iNarrowAspect], 1
@@ -206,64 +199,11 @@ void __declspec(naked) CenterHUD_CC()
             xorps xmm14, xmm14
             xorps xmm15, xmm15
             ret                                 // Original code
-            jmp[CenterHUDReturnJMP]             // Just in case
-
-       checkFade:
-            mov rcx, [rcx + 0x248]
-            cmp rcx, 1000000000
-            jb doNothing
-            movss xmm14, [brushWidth]
-            movss xmm15, [rcx+0x100]
-            comiss xmm15,xmm14
-            je fixBrushHor
-            xorps xmm14, xmm14
-            xorps xmm15, xmm15
-            ret                                 // Original code
-            jmp[CenterHUDReturnJMP]             // Just in case
-
-         fixBrushHor:
-            cmp iNarrowAspect, 1
-            je fixBrushVert
-            movss xmm15, [brushHeight]
-            mulss xmm15, [fNewAspect]
-            movss[rcx + 0x100], xmm15
-            xorps xmm14, xmm14
-            xorps xmm15, xmm15
-            ret                                 // Original code
-            jmp[CenterHUDReturnJMP]             // Just in case
-
-        fixBrushVert:
-            movss xmm15, [brushWidth]
-            divss xmm15, [fNewAspect]
-            movss[rcx + 0x104], xmm15
-            xorps xmm14, xmm14
-            xorps xmm15, xmm15
-            ret                                 // Original code
-            jmp[CenterHUDReturnJMP]             // Just in case         
+            jmp[CenterHUDReturnJMP]             // Just in case       
 
          doNothing:
-            xorps xmm14, xmm14
-            xorps xmm15, xmm15
             ret                                 // Original code
             jmp[CenterHUDReturnJMP]             // Just in case
-
-                checkWipe:
-                movss xmm15, [fTwo]
-                mov rcx, [rcx+0x208]
-                movss [rcx+0x98], xmm15
-                //mov rcx, [rcx + 0x218]
-                //movss[rcx + 0x98], xmm15
-                //mov rcx, [rcx + 0x220]
-                //movss[rcx + 0x98], xmm15
-                //mov rcx, [rcx + 0x228]
-                //movss[rcx + 0x98], xmm15
-                //mov rcx, [rcx + 0x230]
-                //movss[rcx + 0x98], xmm15
-                //mov rcx, [rcx + 0x238]
-                //movss[rcx + 0x98], xmm15
-                //mov rcx, [rcx + 0x240]
-                //movss[rcx + 0x98], xmm15
-                jmp doNothing
     }
 }
 
