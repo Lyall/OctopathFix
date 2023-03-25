@@ -14,7 +14,7 @@ This is a **work-in-progress** fix for ultrawide/narrower displays in Octopath T
 
 ## Installation
 - Grab the latest release of OctopathFix from [here.](https://github.com/Lyall/OctopathFix/releases)
-- Extract the contents of the release zip in to the game directory.<br />(e.g. "**steamapps\common\Octopath_Traveler2**" for Steam).
+- Extract the contents of the release zip in to the game directory.<br />(e.g. "**steamapps\common\OCTOPATH TRAVELER**" for Steam).
 
 ## Configuration
 - See **OctopathFix.ini** to adjust settings for the fix.
