@@ -23,7 +23,7 @@ This is a **work-in-progress** fix for ultrawide/narrower displays in Octopath T
 
 ## Known Issues
 Please report any issues you see. (**Check the known issues list first!**)
-- Some cutscene fades may be 16:9 and not fill the entire screen.
+- Screen fades and the battle wipe transitions are not spanned to fill the screen.
 
 ## Screenshots
 
