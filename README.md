@@ -27,7 +27,7 @@ Please report any issues you see. (**Check the known issues list first!**)
 
 ## Screenshots
 
-| ![ezgif-1-adaa3f0c3c](https://user-images.githubusercontent.com/695941/226225010-073a0360-98bb-4e88-bfef-bcdf3f74abae.gif) |
+| ![ezgif-1-3a596def59](https://user-images.githubusercontent.com/695941/227731085-44e780fb-333b-4661-8b32-88bf300696ad.gif) |
 |:--:|
 | Disabled pillarboxing. |
 
