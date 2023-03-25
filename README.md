@@ -32,7 +32,7 @@ Please report any issues you see. (**Check the known issues list first!**)
 | Disabled pillarboxing. |
 
 ## Credits
-[p1xel8ted](#) for kindly providing a copy of the game.
+[p1xel8ted](#) for kindly providing a copy of the game. <br />
 [Flawless Widescreen](https://www.flawlesswidescreen.org/) for the LOD fix.<br />
 [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader) for ASI loading. <br />
 [inipp](https://github.com/mcmtroffaes/inipp) for ini parsing. <br />
