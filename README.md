@@ -4,17 +4,15 @@
 
 This is a **work-in-progress** fix for ultrawide/narrower displays in Octopath Traveler.
 
-## Caveats
-- This fix is very much still a work in progress. **You will see bugs**.
-
 ## Features
 - Removes pillarboxing at ultrawide or non 16:9 resolutions.
 - Corrects FOV at ultrawide or non 16:9 resolutions.
 - 16:9 centered HUD with fixed UI elements.
+- 60 FPS cap removal.
 
 ## Installation
 - Grab the latest release of OctopathFix from [here.](https://github.com/Lyall/OctopathFix/releases)
-- Extract the contents of the release zip in to the game directory.<br />(e.g. "**steamapps\common\Octopath_Traveler2**" for Steam).
+- Extract the contents of the release zip in to the game directory.<br />(e.g. "**steamapps\common\OCTOPATH TRAVELER**" for Steam).
 
 ## Configuration
 - See **OctopathFix.ini** to adjust settings for the fix.
