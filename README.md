@@ -1,4 +1,4 @@
-# Octopath Traveler Fix
+# Octopath Traveler 2 Fix
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W01UAI9)</br>
 [![Github All Releases](https://img.shields.io/github/downloads/Lyall/OctopathFix/total.svg)](https://github.com/Lyall/OctopathFix/releases)
 
@@ -11,6 +11,7 @@ This is a **work-in-progress** fix for ultrawide/narrower displays in Octopath T
 - Removes pillarboxing at ultrawide or non 16:9 resolutions.
 - Corrects FOV at ultrawide or non 16:9 resolutions.
 - 16:9 centered HUD with fixed UI elements.
+- 60 FPS cap removal.
 
 ## Installation
 - Grab the latest release of OctopathFix from [here.](https://github.com/Lyall/OctopathFix/releases)
@@ -25,6 +26,7 @@ This is a **work-in-progress** fix for ultrawide/narrower displays in Octopath T
 
 ## Known Issues
 Please report any issues you see. (**Check the known issues list first!**)
+- Some cutscene fades may be 16:9 and not fill the entire screen.
 
 ## Screenshots
 
