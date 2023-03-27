@@ -283,24 +283,31 @@ void __declspec(naked) Fade_CC()
         push r14                        // Original code
 
         mov rdi, [rcx+0x248]            // rdi/edi is xor'd later so safe to use
-        movss xmm15, [rcx+0x100]        // pointer to image object
+        cmp rdi, 0
+        je $+0xD                        // if image pointer address is 0 then return
         cmp iNarrowAspect, 1
         je fadeBrushY
         jmp fadeBrushX
         jmp[FadeReturnJMP]
 
         fadeBrushX:
-            movss xmm15, [fFadeBrushX]
+            movss xmm15, [fFadeBrushY]
+            movss xmm14, [fFadeBrushX]
+            movss [rdi+0x104], xmm15
             mulss xmm15, [fNewAspect]
             movss [rdi + 0x100], xmm15  // Write new Brush.ImageSize.X
             xorps xmm15, xmm15
+            xorps xmm14, xmm14
             jmp[FadeReturnJMP]
 
          fadeBrushY:
-            movss xmm15, [fFadeBrushY]
-            mulss xmm15, [fNewAspect]
+            movss xmm15, [fFadeBrushX]
+            movss xmm14, [fFadeBrushY]
+            movss[rdi + 0x100], xmm15
+            divss xmm15, [fNewAspect]
             movss[rdi + 0x104], xmm15  // Write new Brush.ImageSize.Y
             xorps xmm15, xmm15
+            xorps xmm14, xmm14
             jmp[FadeReturnJMP]
     }
 }
@@ -529,10 +536,10 @@ void HUDFix()
         // Resize fades to fill screen
         if (bHUDCenter)
         {
-            uint8_t* FadeScanResult = Memory::PatternScan(baseModule, "48 89 ? ? ? 48 89 ? ? ? 56 57 41 ? 48 83 EC ? 33 FF 48 8B ? 4D 8B ? 48 8B ? 48 8B ? 48 89 ? ? 48 39 ? ? 74 ? 48 8B ? ? 4C 8D ? ? ? E8 ? ? ? ? EB ? 4C 8B ? ? ? ? ? 49 8B ? ? 48 89 ? ? ? ? ? 48 8D ? ? ? E8 ? ? ? ? 48 8B ? ? 48 8D ? ? ? 48 85 ? 0F 57 ? F3 0F ? ? ? ? 48 8B ? 48 0F ? ? 48 39 ? ? 74 ? 48 8B ? ? 4C 8D ? ? ? E8 ? ? ? ? EB ? 4C 8B ? ? ? ? ? 48 8D ? ? ? 49 8B ? ? 48 89 ? ? ? ? ? E8 ? ? ? ? 48 8B ? ? 48 8B ? F3 0F ? ? ? ? 48 85 ? 48 8B ? 40 0F ? ? 48 03 ? 48 89 ? ? E8 ? ? ? ? 48 8B ? ? ? 48 8B ? ? ? 41 88 ? 48 83 C4 ? 41 ? 5F 5E C3 CC CC CC 48 89 ? ? ? 48 89 ? ? ? 48 89");
+            uint8_t* FadeScanResult = Memory::PatternScan(baseModule, "5F 5E C3 CC CC CC 48 89 ?? ?? ?? 48 89 ?? ?? ?? 48 89 ?? ?? ?? 57 48 83 EC ?? 33 FF");
             if (FadeScanResult)
             {
-                DWORD64 FadeAddress = (uintptr_t)FadeScanResult;
+                DWORD64 FadeAddress = (uintptr_t)FadeScanResult - 0xDA;
                 int FadeHookLength = Memory::GetHookLength((char*)FadeAddress, 13);
                 FadeReturnJMP = FadeAddress + FadeHookLength;
                 Memory::DetourFunction64((void*)FadeAddress, Fade_CC, FadeHookLength);
