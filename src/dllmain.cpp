@@ -155,9 +155,6 @@ void __declspec(naked) FOVCulling_CC()
 
 // CenterHUD Hook
 DWORD64 CenterHUDReturnJMP;
-float brushWidth = (float)1280;
-float brushHeight = (float)720;
-INT64 r8_value;
 void __declspec(naked) CenterHUD_CC()
 {
     __asm
@@ -271,6 +268,43 @@ void __declspec(naked) UncapFPS_CC()
     }
 }
 
+// Fade Hook
+DWORD64 FadeReturnJMP;
+float fFadeBrushX = (float)1280;
+float fFadeBrushY = (float)720;
+void __declspec(naked) Fade_CC()
+{
+    __asm
+    {
+        mov[rsp + 0x08], rbx            // Original code
+        mov[rsp + 0x18], rbp            // Original code
+        push rsi                        // Original code
+        push rdi                        // Original code
+        push r14                        // Original code
+
+        mov rdi, [rcx+0x248]            // rdi/edi is xor'd later so safe to use
+        movss xmm15, [rcx+0x100]        // pointer to image object
+        cmp iNarrowAspect, 1
+        je fadeBrushY
+        jmp fadeBrushX
+        jmp[FadeReturnJMP]
+
+        fadeBrushX:
+            movss xmm15, [fFadeBrushX]
+            mulss xmm15, [fNewAspect]
+            movss [rdi + 0x100], xmm15  // Write new Brush.ImageSize.X
+            xorps xmm15, xmm15
+            jmp[FadeReturnJMP]
+
+         fadeBrushY:
+            movss xmm15, [fFadeBrushY]
+            mulss xmm15, [fNewAspect]
+            movss[rdi + 0x104], xmm15  // Write new Brush.ImageSize.Y
+            xorps xmm15, xmm15
+            jmp[FadeReturnJMP]
+    }
+}
+
 void Logging()
 {
     loguru::add_file("OctopathFix.log", loguru::Truncate, loguru::Verbosity_MAX);
@@ -305,7 +339,7 @@ void ReadConfig()
         if (!iniFile)
         {
             LOG_F(ERROR, "Failed to load config file. (Alternate path)");
-            LOG_F(ERROR, "Please check the ini configuration file is in the correct place.");
+            LOG_F(ERROR, "Please ensure that the ini configuration file is in the correct place.");
         }
         else
         {
@@ -319,7 +353,6 @@ void ReadConfig()
         LOG_F(INFO, "Successfuly loaded config file. (Steam)");
     }
 
-    
     LOG_F(INFO, "Game Version: %s", sGameVersion.c_str());
 
     inipp::get_value(ini.sections["OctopathFix Parameters"], "InjectionDelay", iInjectionDelay);
@@ -410,6 +443,7 @@ void AspectFOVFix()
 
     if (bFOVFix)
     {
+        // Fix worse LOD at higher FOVs
         uint8_t* FOVCullingScanResult = Memory::PatternScan(baseModule, "F3 0F ?? ?? F3 0F ?? ?? ?? ?? ?? ?? F2 0F ?? ?? ?? ?? ?? ?? 8B 85 ?? ?? ?? ??");
         if (FOVCullingScanResult)
         {
@@ -452,7 +486,7 @@ void HUDFix()
 
     if (bHUDFix)
     {
-        // Fix offset markers (i.e map icons etc)
+        // Fix offset hud elements (such as dialogue bubbles)
         if (bHUDCenter)
         {
             uint8_t* HUDMarkersScanResult = Memory::PatternScan(baseModule, "74 ?? 48 8B ?? ?? ?? ?? ?? ?? 66 0F ?? ?? 48 C1 ?? ??");
@@ -472,7 +506,7 @@ void HUDFix()
             }
         }
 
-        // Fix battle icons during battle being offset
+        // Fix battle icons/cursor being offset
         if (bHUDCenter)
         {
             uint8_t* BattleCursorScanResult = Memory::PatternScan(baseModule, "66 0F ?? ?? F3 0F ?? ?? F3 0F ?? ?? ?? 0F 5B ?? F3 0F ?? ?? F3 0F ?? ?? F3 0F");
@@ -491,6 +525,26 @@ void HUDFix()
                 LOG_F(INFO, "Battle Cursor: Pattern scan failed.");
             }
         }
+
+        // Resize fades to fill screen
+        if (bHUDCenter)
+        {
+            uint8_t* FadeScanResult = Memory::PatternScan(baseModule, "48 89 ? ? ? 48 89 ? ? ? 56 57 41 ? 48 83 EC ? 33 FF 48 8B ? 4D 8B ? 48 8B ? 48 8B ? 48 89 ? ? 48 39 ? ? 74 ? 48 8B ? ? 4C 8D ? ? ? E8 ? ? ? ? EB ? 4C 8B ? ? ? ? ? 49 8B ? ? 48 89 ? ? ? ? ? 48 8D ? ? ? E8 ? ? ? ? 48 8B ? ? 48 8D ? ? ? 48 85 ? 0F 57 ? F3 0F ? ? ? ? 48 8B ? 48 0F ? ? 48 39 ? ? 74 ? 48 8B ? ? 4C 8D ? ? ? E8 ? ? ? ? EB ? 4C 8B ? ? ? ? ? 48 8D ? ? ? 49 8B ? ? 48 89 ? ? ? ? ? E8 ? ? ? ? 48 8B ? ? 48 8B ? F3 0F ? ? ? ? 48 85 ? 48 8B ? 40 0F ? ? 48 03 ? 48 89 ? ? E8 ? ? ? ? 48 8B ? ? ? 48 8B ? ? ? 41 88 ? 48 83 C4 ? 41 ? 5F 5E C3 CC CC CC 48 89 ? ? ? 48 89 ? ? ? 48 89");
+            if (FadeScanResult)
+            {
+                DWORD64 FadeAddress = (uintptr_t)FadeScanResult;
+                int FadeHookLength = Memory::GetHookLength((char*)FadeAddress, 13);
+                FadeReturnJMP = FadeAddress + FadeHookLength;
+                Memory::DetourFunction64((void*)FadeAddress, Fade_CC, FadeHookLength);
+
+                LOG_F(INFO, "Fade: Hook length is %d bytes", FadeHookLength);
+                LOG_F(INFO, "Fade: Hook address is 0x%" PRIxPTR, (uintptr_t)FadeAddress);
+            }
+            else if (!FadeScanResult)
+            {
+                LOG_F(INFO, "Fade: Pattern scan failed.");
+            }
+        }
     } 
 }
 
@@ -498,6 +552,7 @@ void UncapFPS()
 {
     if (bUncapFPS)
     {
+        // Uncap 60FPS limit
         uint8_t* UncapFPSScanResult = Memory::PatternScan(baseModule, "77 ?? 0F 28 ?? 0F 28 ?? ?? ?? 44 0F ?? ?? ?? ?? 44 0F ?? ?? ?? ?? 48 83 ?? ?? 5B C3");
         if (UncapFPSScanResult)
         {
