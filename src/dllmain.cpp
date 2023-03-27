@@ -27,6 +27,7 @@ float fNewY;
 float fNativeAspect = 1.777777791f;
 float fPi = 3.14159265358979323846f;
 float fNewAspect;
+float fAspectMultiplier;
 float fZero = (float)0;
 float fOne = (float)1;
 float fTwo = (float)2;
@@ -80,6 +81,10 @@ void __declspec(naked) CurrResolution_CC()
         subss xmm14, [UIHeight]
         divss xmm14, [fTwo]
         movss [UIVertOffset], xmm14
+        movss xmm14, [fNewAspect]
+        movss xmm15, [fNativeAspect]
+        divss xmm14, xmm15
+        movss [fAspectMultiplier], xmm14
 
         xorps xmm14, xmm14
         xorps xmm15, xmm15
@@ -163,6 +168,8 @@ void __declspec(naked) CenterHUD_CC()
         mov rax, rdx                            // Original code
         movups[rdx], xmm0                       // Original code
 
+        cmp byte ptr[rcx + 0x248], 1
+        je fixBattleWipe
         cmp [iNarrowAspect], 0
         je resizeHUDHor
         cmp [iNarrowAspect], 1
@@ -196,7 +203,56 @@ void __declspec(naked) CenterHUD_CC()
             xorps xmm14, xmm14
             xorps xmm15, xmm15
             ret                                 // Original code
-            jmp[CenterHUDReturnJMP]             // Just in case       
+            jmp[CenterHUDReturnJMP]             // Just in case
+
+                fixBattleWipe:
+                cmp dword ptr[rcx + 0xb6], 1024
+                jne $-0xA1
+                cmp byte ptr[rcx + 0xb7], 4
+                jne $-0xAE
+                push r8
+                cmp iNarrowAspect, 1
+                je resizeScaleHor
+                movss xmm15, [fOne]
+                mulss xmm15, [fAspectMultiplier]
+                mov r8, [rcx + 0x208]
+                movss [r8 + 0x98], xmm15
+                mov r8, [rcx + 0x218]
+                movss[r8 + 0x98], xmm15
+                mov r8, [rcx + 0x220]
+                movss[r8 + 0x98], xmm15
+                mov r8, [rcx + 0x228]
+                movss[r8 + 0x98], xmm15
+                mov r8, [rcx + 0x230]
+                movss[r8 + 0x98], xmm15
+                mov r8, [rcx + 0x238]
+                movss[r8 + 0x98], xmm15
+                mov r8, [rcx + 0x240]
+                movss[r8 + 0x98], xmm15
+                pop r8
+                xorps xmm15,xmm15
+                jmp $-0x14B
+
+                    resizeScaleHor:
+                    movss xmm15, [fOne]
+                    divss xmm15, [fAspectMultiplier]
+                    mov r8, [rcx + 0x208]
+                    movss[r8 + 0x9C], xmm15
+                    mov r8, [rcx + 0x218]
+                    movss[r8 + 0x9C], xmm15
+                    mov r8, [rcx + 0x220]
+                    movss[r8 + 0x9C], xmm15
+                    mov r8, [rcx + 0x228]
+                    movss[r8 + 0x9C], xmm15
+                    mov r8, [rcx + 0x230]
+                    movss[r8 + 0x9C], xmm15
+                    mov r8, [rcx + 0x238]
+                    movss[r8 + 0x9C], xmm15
+                    mov r8, [rcx + 0x240]
+                    movss[r8 + 0x9C], xmm15
+                    pop r8
+                    xorps xmm15, xmm15
+                    jmp $-0x1D8
 
          doNothing:
             ret                                 // Original code
