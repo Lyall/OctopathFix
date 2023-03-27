@@ -23,15 +23,16 @@ This is a **work-in-progress** fix for ultrawide/narrower displays in Octopath T
 
 ## Known Issues
 Please report any issues you see. (**Check the known issues list first!**)
-- Some cutscene fades may be 16:9 and not fill the entire screen.
+- Screen fades and the battle wipe transitions are not spanned to fill the screen.
 
 ## Screenshots
 
-| ![ezgif-1-adaa3f0c3c](https://user-images.githubusercontent.com/695941/226225010-073a0360-98bb-4e88-bfef-bcdf3f74abae.gif) |
+| ![ezgif-1-3a596def59](https://user-images.githubusercontent.com/695941/227731085-44e780fb-333b-4661-8b32-88bf300696ad.gif) |
 |:--:|
 | Disabled pillarboxing. |
 
 ## Credits
+[p1xel8ted](https://github.com/p1xel8ted) for kindly providing a copy of the game. <br />
 [Flawless Widescreen](https://www.flawlesswidescreen.org/) for the LOD fix.<br />
 [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader) for ASI loading. <br />
 [inipp](https://github.com/mcmtroffaes/inipp) for ini parsing. <br />
